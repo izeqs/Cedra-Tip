@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Quick Tip – Downtown Bistro</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --mint:    #3db98e;
+    --sky:     #4aa8e8;
+    --bg:      #f0f7f5;
+    --card:    #ffffff;
+    --surface: #f5faf8;
+    --border:  rgba(0,0,0,0.07);
+    --text:    #111d1a;
+    --muted:   #8a9fa0;
+    --radius:  20px;
+  }
+
+  p#overlayMsg {
+    font-weight: 700;
+    padding-bottom: 20px;
+}
+
+  body {
+    background: var(--bg);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow: hidden;
+  }
+/* .tip-box svg {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 10px;
+    fill: var(--mint);
+} */
+  /* Ambient blobs */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-1 {
+    width: 520px; height: 520px;
+    background: radial-gradient(circle, rgba(61,185,142,0.15) 0%, transparent 70%);
+    top: -160px; left: -180px;
+  }
+  .blob-2 {
+    width: 480px; height: 480px;
+    background: radial-gradient(circle, rgba(74,168,232,0.12) 0%, transparent 70%);
+    bottom: -140px; right: -160px;
+  }
+
+  /* Card */
+  .card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.03),
+      0 40px 80px -20px rgba(0,0,0,0.10),
+      0 2px 40px rgba(61,185,142,0.06);
+  }
+
+  /* Header */
+  .header {
+    padding: 40px 36px 15px;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(61,185,142,0.06) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .icon-ring {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--mint) 0%, var(--sky) 100%);
+    box-shadow: 0 0 0 8px rgba(61,185,142,0.1), 0 12px 28px rgba(61,185,142,0.3);
+    margin-bottom: 20px;
+    animation: pulse-ring 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-ring {
+    0%, 100% { box-shadow: 0 0 0 8px rgba(61,185,142,0.1), 0 12px 28px rgba(61,185,142,0.3); }
+    50%       { box-shadow: 0 0 0 14px rgba(61,185,142,0.06), 0 12px 28px rgba(61,185,142,0.4); }
+  }
+
+  .icon-ring svg { width: 32px; height: 32px; fill: #fff; }
+
+  .header h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 27px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.18;
+      letter-spacing: -0.6px;
+      padding-top: 28px;
+      padding-bottom: 8px;
+  }
+
+  .header h1 span {
+    background: linear-gradient(90deg, var(--mint) 0%, var(--sky) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+.header p {
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+  /* Staff strip */
+  .staff-strip {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 28px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .avatar-wrap img {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--mint);
+  }
+
+  .avatar-dot {
+    position: absolute;
+    bottom: 1px; right: 1px;
+    width: 11px; height: 11px;
+    background: #3dcd84;
+    border-radius: 50%;
+    border: 2px solid var(--card);
+  }
+
+  .staff-info p:first-child {
+    font-family: 'Outfit', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mint);
+    margin-bottom: 3px;
+  }
+
+  .staff-info p:last-child {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.2px;
+  }
+
+  .badge {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(61,185,142,0.1);
+    border: 1px solid rgba(61,185,142,0.2);
+    border-radius: 100px;
+    padding: 5px 10px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--mint);
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  .badge svg { width: 12px; height: 12px; fill: var(--mint); }
+
+  /* Body */
+.body {
+    padding: 35px 28px 74px;
+}
+
+.label {
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+}
+
+  /* Tip grid */
+  .tip-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+    margin-top: 16px;
+  }
+
+  .tip-btn {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 114px;
+    background: var(--surface);
+    border: 1.5px solid rgba(0,0,0,0.08);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: visible;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .tip-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--mint), var(--sky));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    border-radius: inherit;
+  }
+
+  .tip-btn:hover {
+    border-color: rgba(61,185,142,0.35);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(61,185,142,0.15);
+  }
+
+  .tip-btn:hover::before { opacity: 1; }
+
+  .tip-btn.active {
+    border-color: var(--mint);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(61,185,142,0.2);
+  }
+
+  .tip-btn.active::before { opacity: 1; }
+
+  .tip-btn.active .tip-badge { opacity: 1; transform: scale(1); }
+
+  .tip-amount {
+    position: relative;
+    z-index: 1;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -1px;
+    transition: color 0.15s ease;
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+
+  .tip-unit {
+    position: relative;
+    z-index: 1;
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.15s ease;
+  }
+
+  .tip-btn:hover .tip-amount,
+  .tip-btn.active .tip-amount { color: #fff; }
+
+  .tip-btn:hover .tip-unit,
+  .tip-btn.active .tip-unit { color: rgba(255,255,255,0.75); }
+
+  .tip-badge {
+    position: absolute;
+    top: 8px; right: 8px;
+    z-index: 2;
+    background: rgba(255,255,255,0.3);
+    border-radius: 100px;
+    width: 18px; height: 18px;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .tip-badge svg { width: 10px; height: 10px; fill: #fff; }
+
+  /* Popular chip */
+  .popular-chip {
+    position: absolute;
+    top: -10px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(90deg, var(--mint), var(--sky));
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 7.5px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2.5px 7px;
+    border-radius: 100px;
+    z-index: 3;
+    white-space: nowrap;
+    box-shadow: 0 2px 10px rgba(61,185,142,0.35);
+  }
+
+  /* Custom amount */
+  .custom-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1.5px solid rgba(0,0,0,0.08);
+    border-radius: var(--radius);
+    padding: 0 18px;
+    height: 56px;
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .custom-row:focus-within {
+    border-color: rgba(61,185,142,0.45);
+    box-shadow: 0 0 0 3px rgba(61,185,142,0.08);
+  }
+
+  .custom-row span {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .custom-row input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    width: 100%;
+  }
+
+  .custom-row input::placeholder { color: #b5c8c9; }
+
+  /* CTA */
+  .cta-btn {
+    width: 100%;
+    height: 60px;
+    border: none;
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, var(--mint) 0%, var(--sky) 100%);
+    color: #fff;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(61,185,142,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 36px rgba(61,185,142,0.38), inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+
+  .cta-btn:active { transform: scale(0.97); }
+
+  .cta-btn svg { width: 20px; height: 20px; fill: #fff; }
+
+  .cta-amount {
+    background: rgba(0,0,0,0.12);
+    border-radius: 8px;
+    padding: 3px 10px;
+    font-size: 15px;
+  }
+
+  /* Footer */
+  .footer {
+    padding: 20px 28px 28px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .trust-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .trust-row svg { width: 14px; height: 14px; fill: var(--mint); }
+
+  .pay-logos {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    opacity: 0.45;
+    transition: all 0.4s ease;
+  }
+
+  .pay-logos:hover { opacity: 0.85; }
+
+  .pay-logo-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
+    padding: 0 12px;
+    background: rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.09);
+    border-radius: 8px;
+    gap: 5px;
+  }
+
+  .pay-logo-pill svg { flex-shrink: 0; }
+
+  .pay-logo-text {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+
+  .powered {
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+
+  .powered strong {
+    color: var(--mint);
+    font-weight: 800;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    letter-spacing: 0.01em;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: linear-gradient(135deg, var(--mint), var(--sky));
+    color: #fff;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 28px;
+    border-radius: 100px;
+    box-shadow: 0 12px 32px rgba(61,185,142,0.4);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    z-index: 100;
+    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    opacity: 0;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast svg { width: 18px; height: 18px; fill: #fff; }
+
+
+  .tip-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.3s ease;
+}
+
+.tip-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.tip-box {
+  width: 85%;
+  max-width: 320px;
+  background: #F5FAF8;
+  border-radius: 26px 26px 18px 18px;
+  padding: 30px 20px 24px;
+  text-align: center;
+  transform: translateY(40px) scale(.95);
+  transition: .35s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.tip-overlay.show .tip-box {
+  transform: translateY(0) scale(1);
+}
+
+.close-overlay {
+  width: 100%;
+  height: 46px;
+  border: none;
+  border-radius: 14px;
+  color: #fff;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--mint) 0%, var(--sky) 100%);
+}
+
+
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div> 
+
+<div class="card">
+
+  <!-- Header -->
+  <div class="header">
+    <!-- <div class="icon-ring" id="iconRing"></div> -->
+     <img src="logo.svg" alt="Cedra" />
+    <h1>You’re tipping <span>the <br/> restroom attendant</span></h1>
+    <p>100% of your tip goes directly to the attendant</p>
+  </div>
+
+  <!-- Staff strip -->
+  <!-- <div class="staff-strip">
+    <div class="avatar-wrap">
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRnPqkurFGtm-fs38j1CTMtt5OYLsKzxa5fL9zJIhcKnBiRQORwE5v1vaafc2Zl9UsDDSJ0wxNin5mNlI41NnmFh_2zAQRGRltHRWewa6_liqW0Vl_zf3Zv3-X2A3hkjW-L81A7tuY28H-5JdnE3InyjSjlsoXIuzMoxYMngPQ46VbX2wh-wzPDwQNxBcPPTeJWfvUsp13LbZXVOawhx2OH_hHKdTKoz2fH3Alp3QXpZ-eddI99b7ViyFIbuAmduiY8eDo-zkfZgCn" alt="Team"/>
+      <div class="avatar-dot"></div>
+    </div>
+    <div class="staff-info">
+      <p>Serving you today</p>
+      <p>The Downtown Bistro Team</p>
+    </div>
+    <div class="badge">
+      <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+      Verified
+    </div>
+  </div> -->
+
+  <!-- Body -->
+  <div class="body">
+    <div class="label">Choose a tip amount</div>
+
+    <div class="tip-grid">
+      <button class="tip-btn active" onclick="selectTip(this, 10)">
+                <div class="popular-chip">Most popular</div>
+        <div class="tip-badge">
+          <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <span class="tip-amount">10</span>
+        <span class="tip-unit">AED</span>
+      </button>
+
+      <button class="tip-btn" onclick="selectTip(this, 15)">
+
+        <div class="tip-badge" style="opacity:1;transform:scale(1)">
+          <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <span class="tip-amount">15</span>
+        <span class="tip-unit">AED</span>
+      </button>
+
+      <button class="tip-btn" onclick="selectTip(this, 20)">
+        <div class="tip-badge">
+          <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <span class="tip-amount">20</span>
+        <span class="tip-unit">AED</span>
+      </button>
+    </div>
+
+    <!-- Custom input -->
+    <div class="custom-row">
+      <span>AED</span>
+      <input type="number" placeholder="Enter custom amount" min="1" id="customInput" oninput="handleCustom(this)" onfocus="clearPreset()"/>
+    </div>
+
+    <!-- CTA -->
+    <button class="cta-btn" onclick="sendTip()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      Send tip
+      <span class="cta-amount" id="ctaAmount">10 AED</span>
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <!-- <div class="trust-row">
+      <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+      100% goes directly to staff · Encrypted & secure
+    </div> -->
+    <div class="pay-logos">
+      <div class="pay-logo-pill">
+        <svg width="28" height="10" viewBox="0 0 64 20" fill="none">
+          <text x="0" y="16" font-family="Arial,sans-serif" font-weight="900" font-size="18" fill="#1a1a2e" letter-spacing="-1">VISA</text>
+        </svg>
+      </div>
+      <div class="pay-logo-pill">
+        <svg width="30" height="19" viewBox="0 0 30 19" fill="none">
+          <circle cx="11" cy="9.5" r="9.5" fill="#EB001B" opacity="0.9"/>
+          <circle cx="19" cy="9.5" r="9.5" fill="#F79E1B" opacity="0.9"/>
+          <path d="M15 4.2a9.5 9.5 0 0 1 0 10.6A9.5 9.5 0 0 1 15 4.2z" fill="#FF5F00"/>
+        </svg>
+      </div>
+      <div class="pay-logo-pill">
+        <svg width="13" height="16" viewBox="0 0 13 16" fill="#1a1a2e">
+          <path d="M10.56 8.27c-.02-2.1 1.71-3.1 1.79-3.15-0.97-1.42-2.48-1.61-3.02-1.63-1.29-.13-2.52.76-3.17.76-.65 0-1.66-.74-2.73-.72C1.9 3.55.76 4.38.14 5.62c-1.24 2.14-.32 5.31.89 7.05.59.85 1.29 1.81 2.21 1.78.89-.04 1.23-.57 2.3-.57 1.07 0 1.38.57 2.31.55.96-.02 1.56-.87 2.14-1.73.68-.99.96-1.96 0.97-2.01-.02-.01-1.88-.72-1.9-2.82z"/>
+          <path d="M8.64 2.18c.49-.59.82-1.41.73-2.23-.71.03-1.57.47-2.07 1.06-.45.52-.85 1.36-.75 2.16.8.06 1.61-.41 2.09-0.99z"/>
+        </svg>
+        <span class="pay-logo-text">Pay</span>
+      </div>
+    </div>
+    <div class="powered">Powered by <strong>CEDRA</strong> Digital Payments</div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<!-- <div class="toast" id="toast">
+  <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+  <span id="toastMsg">Tip sent! Thank you 🎉</span>
+</div> -->
+
+<!-- Overlay Confirmation -->
+<div class="tip-overlay" id="tipOverlay">
+  <div class="tip-box">
+    <!-- <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> -->
+        <div class="icon-ring" id="iconRing"></div>
+
+    <p id="overlayMsg">Tip sent! Thank you 🎉</p>
+
+    <button class="close-overlay" onclick="closeOverlay()">
+      Close
+    </button>
+  </div>
+</div>
+
+
+<script>
+  let selectedValue = 15;
+
+  document.getElementById('iconRing').innerHTML = `<svg viewBox="0 0 24 24" style="width:34px;height:34px;fill:#fff">
+    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+  </svg>`;
+
+  function selectTip(btn, value) {
+    document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedValue = value;
+    document.getElementById('customInput').value = '';
+    updateCTA();
+  }
+
+  function clearPreset() {
+    document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('active'));
+    selectedValue = null;
+    updateCTA();
+  }
+
+  function handleCustom(input) {
+    const val = parseFloat(input.value);
+    if (val > 0) {
+      selectedValue = val;
+      document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('active'));
+    } else {
+      selectedValue = null;
+    }
+    updateCTA();
+  }
+
+  function updateCTA() {
+    const el = document.getElementById('ctaAmount');
+    el.textContent = selectedValue ? selectedValue + ' AED' : '—';
+  }
+
+  // function sendTip() {
+  //   if (!selectedValue || selectedValue <= 0) return;
+  //   const toast = document.getElementById('toast');
+  //   document.getElementById('toastMsg').textContent = `Tip of ${selectedValue} AED sent! Thank you 🎉`;
+  //   toast.classList.add('show');
+  //   setTimeout(() => toast.classList.remove('show'), 3200);
+  // }
+  function sendTip() {
+  if (!selectedValue || selectedValue <= 0) return;
+  document.getElementById('overlayMsg').textContent = `Tip of ${selectedValue} AED sent! Thank you 🎉`;
+  document.getElementById('tipOverlay').classList.add('show');
+}
+function closeOverlay() {
+  document.getElementById('tipOverlay').classList.remove('show');
+}
+
+
+</script>
+
+</body>
+</html>
+
